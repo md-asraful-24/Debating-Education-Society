@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/Navbar';
+import Sidebar from '@/components/Sidebar';
 import Footer from '@/components/Footer';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AuthProvider } from '@/context/AuthContext';
@@ -18,15 +18,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="bn" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white">
+      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white overflow-x-hidden">
         <LanguageProvider>
           <AuthProvider>
             <ThemeProvider>
-              <Navbar />
-              <main className="flex-1">
-                {children}
-              </main>
-              <Footer />
+              <div className="min-h-screen flex flex-col md:flex-row">
+                {/* Fixed/Sticky Left Sidebar on Desktop & Tablet / Clean Drawer on Mobile */}
+                <Sidebar />
+
+                {/* Main Content Area on the Right */}
+                <div className="flex-1 min-w-0 flex flex-col min-h-screen">
+                  <main className="flex-1 min-w-0">
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </div>
             </ThemeProvider>
           </AuthProvider>
         </LanguageProvider>
