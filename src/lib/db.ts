@@ -30,6 +30,7 @@ const initialSettings: SiteSettings = {
     bn: 'ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ',
     en: 'Debating Education Society in Bangladesh',
   },
+  logoUrl: '/images/logo.jpg',
   theme: 'emerald',
   officialGmail: 'debatingeducationsociety.bd@gmail.com',
   phone: '+880 1873-528395',
@@ -607,6 +608,10 @@ export function getDatabase(): DatabaseSchema {
         existingSuper.isVerified = true;
         existingSuper.status = 'active';
         saveDatabase(inMemoryDb!);
+      }
+
+      if (inMemoryDb && !inMemoryDb.settings.logoUrl) {
+        inMemoryDb.settings.logoUrl = '/images/logo.jpg';
       }
 
       return inMemoryDb!;

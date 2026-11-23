@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import Logo from '@/components/Logo';
 import {
   Mail,
   Lock,
@@ -115,9 +116,9 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[75vh] flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6">
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-theme-primary flex items-center justify-center text-white font-extrabold text-xl mx-auto shadow-md">
-            ডি
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <Logo variant="auth" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">
             {step === 'form' ? t('registerTitle') : t('enterOtp')}

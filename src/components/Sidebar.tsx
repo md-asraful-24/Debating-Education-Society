@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import Logo from './Logo';
 import {
   Home,
   Calendar,
@@ -75,19 +76,9 @@ export default function Sidebar() {
           <Link
             href="/"
             onClick={() => setMobileOpen(false)}
-            className="flex items-center gap-3 group"
+            className="group flex-1 min-w-0"
           >
-            <div className="w-10 h-10 rounded-2xl bg-theme-primary flex items-center justify-center text-white font-black text-lg shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform shrink-0">
-              ডি
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-extrabold text-sm text-slate-900 dark:text-white leading-tight truncate">
-                {language === 'bn' ? 'ডিবেটিং এডুকেশন সোসাইটি' : 'Debating Education'}
-              </span>
-              <span className="text-[11px] font-bold text-theme-primary tracking-wide truncate">
-                {language === 'bn' ? 'সোসাইটি ইন বাংলাদেশ' : 'Society in Bangladesh'}
-              </span>
-            </div>
+            <Logo variant="sidebar" />
           </Link>
 
           {/* Close button inside mobile drawer */}
@@ -266,17 +257,7 @@ export default function Sidebar() {
       {/* 1. Mobile Top Header Bar: Cleanly adapted to mobile viewport width with 0 overflow */}
       <header className="md:hidden sticky top-0 z-30 h-16 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-theme-primary flex items-center justify-center text-white font-black text-base shadow-md shadow-emerald-700/20">
-            ডি
-          </div>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
-              {language === 'bn' ? 'ডিবেটিং এডুকেশন সোসাইটি' : 'Debating Education Society'}
-            </span>
-            <span className="text-[10px] font-bold text-theme-primary">
-              {language === 'bn' ? 'বাংলাদেশ চ্যাপ্টার' : 'in Bangladesh'}
-            </span>
-          </div>
+          <Logo variant="mobile" />
         </Link>
 
         <div className="flex items-center gap-2">

@@ -118,6 +118,7 @@ export type ThemeName = 'emerald' | 'crimson' | 'blue' | 'midnight' | 'sunset';
 
 export interface SiteSettings {
   siteName: LocalizedString;
+  logoUrl?: string;
   theme: ThemeName;
   officialGmail: string;
   phone: string;

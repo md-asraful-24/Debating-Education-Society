@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import Logo from './Logo';
 import { SiteSettings } from '@/lib/types';
 import {
   Mail,
@@ -34,19 +35,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Column 1: Society Info & Mission */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-theme-primary flex items-center justify-center text-white font-bold shadow-md">
-                ডি
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-white text-base leading-tight">
-                  {settings ? loc(settings.siteName) : t('societyName')}
-                </span>
-                <span className="text-xs text-emerald-400 font-semibold">
-                  {language === 'bn' ? 'বাংলাদেশ চ্যাপ্টার' : 'in Bangladesh'}
-                </span>
-              </div>
-            </div>
+            <Logo variant="footer" logoUrl={settings?.logoUrl} />
             <p className="text-xs text-slate-400 leading-relaxed">
               {settings
                 ? loc(settings.aboutContent)?.slice(0, 160) + '...'

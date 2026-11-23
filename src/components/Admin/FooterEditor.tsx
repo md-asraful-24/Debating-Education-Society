@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { SiteSettings, LeadershipMember } from '@/lib/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { FileEdit, Save, Plus, Trash2, CheckCircle, Users } from 'lucide-react';
+import { FileEdit, Save, Plus, Trash2, CheckCircle, Users, ImageIcon } from 'lucide-react';
 
 export default function FooterEditor() {
   const { t, language } = useLanguage();
@@ -91,6 +91,47 @@ export default function FooterEditor() {
           <span>{statusMsg}</span>
         </div>
       )}
+
+      {/* Logo URL Configuration */}
+      <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <ImageIcon className="w-4 h-4 text-theme-primary" />
+          <span>{language === 'bn' ? 'Logo Image Settings' : 'Logo Image Settings'}</span>
+        </h3>
+        <p className="text-[11px] text-slate-500">
+          {language === 'bn'
+            ? 'Change the logo shown across Sidebar, Footer, mobile header, and Login/Register pages. Default: /images/logo.jpg'
+            : 'Change the logo shown across Sidebar, Footer, mobile header, and Login/Register pages. Default: /images/logo.jpg'}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
+          <div className="flex-1 w-full">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+              Logo Image URL / Path
+            </label>
+            <input
+              type="text"
+              value={settings.logoUrl || '/images/logo.jpg'}
+              onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
+              placeholder="/images/logo.jpg"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
+            />
+            <span className="text-[10px] text-slate-400 mt-1 block">
+              Place image in public folder (e.g. /images/logo.jpg) or provide a full URL
+            </span>
+          </div>
+          <div className="shrink-0">
+            <span className="text-[10px] text-slate-500 font-bold block mb-1">Preview</span>
+            <div className="w-16 h-16 rounded-2xl bg-white p-1 border border-slate-200 dark:border-slate-700 shadow-xs flex items-center justify-center overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={settings.logoUrl || '/images/logo.jpg'}
+                alt="Logo preview"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Official Contact Details */}
       <div className="p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">

@@ -9,6 +9,11 @@ import { ThemeProvider } from '@/context/ThemeContext';
 export const metadata: Metadata = {
   title: 'Debating Education Society in Bangladesh | ডিবেটিং এডুকেশন সোসাইটি',
   description: 'National bilingual web platform for Debating Education Society in Bangladesh (DESB). Parliamentary debate schedules, time-locked Google Meet, automated winner highlights, universal communication center, and standard CV maker.',
+  icons: {
+    icon: '/images/logo.png',
+    shortcut: '/favicon.ico',
+    apple: '/images/logo.png',
+  },
 };
 
 export default function RootLayout({
