@@ -1,0 +1,606 @@
+import fs from 'fs';
+import path from 'path';
+import {
+  User,
+  OTPRecord,
+  SliderImage,
+  Debate,
+  ChatMessage,
+  SiteSettings,
+} from './types';
+
+export interface DatabaseSchema {
+  users: User[];
+  otps: OTPRecord[];
+  sliders: SliderImage[];
+  debates: Debate[];
+  messages: ChatMessage[];
+  settings: SiteSettings;
+}
+
+// Ensure database path exists
+const DB_DIR = path.join(process.cwd(), 'data');
+const DB_FILE = path.join(DB_DIR, 'db.json');
+
+// In-memory cache for fast read/write, especially if running on read-only serverless filesystem
+let inMemoryDb: DatabaseSchema | null = null;
+
+const initialSettings: SiteSettings = {
+  siteName: {
+    bn: 'ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ',
+    en: 'Debating Education Society in Bangladesh',
+  },
+  theme: 'emerald',
+  officialGmail: 'debatingeducationsociety.bd@gmail.com',
+  phone: '+880 1873-528395',
+  address: {
+    bn: 'বাড়ি #২৪, রোড #১০, সেক্টর #৪, উত্তরা, ঢাকা-১২৩০, বাংলাদেশ',
+    en: 'House #24, Road #10, Sector #4, Uttara, Dhaka-1230, Bangladesh',
+  },
+  facebookUrl: 'https://facebook.com/DebatingEducationSocietyBD',
+  aboutContent: {
+    bn: 'ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ (DESB) বাংলাদেশের তরুণ প্রজন্মের মাঝে যুক্তিভিত্তিক চিন্তা, গঠনমূলক বিতর্ক ও গণতান্ত্রিক মূল্যবোধ বিকাশে অঙ্গীকারাবদ্ধ একটি জাতীয় বিতর্ক ও শিক্ষামূলক সংগঠন। আমরা নিয়মিত সংসদীয় ও আন্তর্জাতিক পদ্ধতির বিতর্ক কর্মশালা, জাতীয় চ্যাম্পিয়নশিপ এবং মুক্ত আলোচনা সভার আয়োজন করে থাকি।',
+    en: 'Debating Education Society in Bangladesh (DESB) is a premier national oratory and educational organization committed to cultivating critical thinking, rational discourse, and democratic ideals among Bangladeshi youth. We regularly organize parliamentary debate workshops, national championships, and intellectual forums.',
+  },
+  termsOfService: {
+    bn: '১. সকল সদস্যকে বিতর্কের শিষ্টাচার বজায় রাখতে হবে।\n২. গঠনমূলক সমালোচনা গ্রহণযোগ্য, কিন্তু ব্যক্তিগত আক্রমণ সম্পূর্ণ নিষিদ্ধ।\n৩. সংগঠনের যেকোনো ভার্চুয়াল মিটিং ও বিতর্ক সেশনে পূর্বানুমতি সাপেক্ষে নির্ধারিত সময়ে যোগ দিতে হবে।\n৪. কোনো অননুমোদিত বাণিজ্যিক বিজ্ঞাপন বা লিঙ্ক শেয়ার করা যাবে না।\n৫. নীতিমালা ভঙ্গ করলে অ্যাডমিন প্যানেল যেকোনো সদস্যের সদস্যপদ স্থগিত বা বাতিল করার পূর্ণ ক্ষমতা রাখে।',
+    en: '1. All members must uphold debate etiquette and mutual respect.\n2. Constructive criticism is encouraged, but ad hominem attacks are strictly prohibited.\n3. Attendance at virtual sessions must adhere to scheduled time windows.\n4. Unauthorized promotional materials or spam are forbidden.\n5. Administration reserves full authority to suspend or revoke membership for non-compliance.',
+  },
+  conductRules: {
+    bn: 'কঠোর আচরণবিধি ও হয়রানি বিরোধী নীতিমালা:\nযেকোনো ধরনের গালাগালি, সাম্প্রদায়িক বা বর্ণবাদী মন্তব্য, নারীবিদ্বেষ, হুমকি বা ব্যক্তিগত আক্রমণ কঠোরভাবে নিষিদ্ধ (Zero Tolerance Policy)। কোনো সদস্য এই নিয়ম লঙ্ঘন করলে অ্যাডমিন প্যানেল তাৎক্ষণিক সতর্কতা, কিক (Kick), সাময়িক বহিষ্কার অথবা স্থায়ীভাবে ব্যান (Permanent Ban) করবে। বিতর্কের মঞ্চ হোক মুক্ত, যুক্তিপূর্ণ ও নিরাপদ।',
+    en: 'Strict Code of Conduct & Anti-Harassment Policy:\nAny form of profanity, slurs, communal hatred, misogyny, harassment, or verbal abuse is strictly prohibited under our Zero Tolerance Policy. Violations will result in immediate disciplinary action including official warnings, room kicks, temporary bans, or permanent expulsion by the Admin Panel. Our debate society must remain a safe, respectful, and intellect-driven sanctuary.',
+  },
+  leadership: [
+    {
+      id: 'lead-1',
+      name: 'MD Zahid Hasan',
+      role: {
+        bn: 'প্রধান পৃষ্ঠপোষক ও প্রতিষ্ঠাতা সভাপতি',
+        en: 'Chief Patron & Founding President',
+      },
+      email: 'zahidmaxshahi@gmail.com',
+      phone: '+8801873528395',
+      order: 1,
+    },
+    {
+      id: 'lead-2',
+      name: 'Dr. Shahriar Rahman',
+      role: {
+        bn: 'উপ-সভাপতি ও প্রধান বিচারক প্যানেল প্রধান',
+        en: 'Vice President & Head of Adjudication',
+      },
+      email: 'shahriar.desb@gmail.com',
+      phone: '+8801711223344',
+      order: 2,
+    },
+    {
+      id: 'lead-3',
+      name: 'Nusrat Jahan Chowdhury',
+      role: {
+        bn: 'সাধারণ সম্পাদক ও সাংগঠনিক প্রধান',
+        en: 'General Secretary & Head of Organizing',
+      },
+      email: 'nusrat.desb@gmail.com',
+      phone: '+8801819876543',
+      order: 3,
+    },
+    {
+      id: 'lead-4',
+      name: 'Tanvir Ahmed Shanto',
+      role: {
+        bn: 'প্রধান মডারেটর ও বিতর্ক সমন্বয়কারী',
+        en: 'Chief Moderator & Debate Coordinator',
+      },
+      email: 'tanvir.mod@gmail.com',
+      phone: '+8801912345678',
+      order: 4,
+    },
+  ],
+  debateResources: [
+    {
+      id: 'res-1',
+      title: {
+        bn: 'সংসদীয় বিতর্ক নিয়মাবলী ও গাইডবুক ২০২৬',
+        en: 'Parliamentary Debate Rules & Guidebook 2026',
+      },
+      url: 'https://desb.org.bd/resources/rules.pdf',
+      description: {
+        bn: 'এশিয়ান এবং ব্রিটিশ সংসদীয় পদ্ধতির যাবতীয় নিয়মকানুন ও পয়েন্ট অব ইনফরমেশন নির্দেশিকা।',
+        en: 'Comprehensive manual on Asian and British Parliamentary formats, POIs, and speaker roles.',
+      },
+    },
+    {
+      id: 'res-2',
+      title: {
+        bn: 'বিচারক মূল্যায়ন ও মার্কিং মানদণ্ড',
+        en: 'Adjudication Rubrics & Marking Standards',
+      },
+      url: 'https://desb.org.bd/resources/judging.pdf',
+      description: {
+        bn: 'ম্যাটার, ম্যানার ও মেথড মূল্যায়নের আন্তর্জাতিক স্ট্যান্ডার্ড এবং স্কোরশিট ব্যবহারের নিয়মাবলী।',
+        en: 'International adjudication criteria evaluating Matter, Manner, and Method with standardized scoring.',
+      },
+    },
+  ],
+};
+
+const initialUsers: User[] = [
+  {
+    id: 'user-admin',
+    name: 'Admin Panel',
+    email: 'admin@gmail.com',
+    passwordHash: '$2b$10$qfW.M0V8hWb7OJYwIf6WsuAKzmAjkaV7DJo6p2u24AyWxWkmpunIq', // AdminPassword123!
+    role: 'admin',
+    isVerified: true,
+    status: 'active',
+    panelRole: 'chairperson',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-mod',
+    name: 'Moderator Council',
+    email: 'moderator@gmail.com',
+    passwordHash: '$2b$10$BHKkp2Zo3M9F1iTz1eqdie3f.4WtmX8r9Xzt1Zuo4VEZSt5coNYqa', // ModeratorPassword123!
+    role: 'moderator',
+    isVerified: true,
+    status: 'active',
+    panelRole: 'vice_chairperson',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-1',
+    name: 'MD Zahid Hasan',
+    email: 'zahidmaxshahi@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS', // DebaterPassword123!
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-a',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-2',
+    name: 'Sadia Sultana',
+    email: 'sadia.debater@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS',
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-a',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-3',
+    name: 'Arif Hossain',
+    email: 'arif.debater@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS',
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-a',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-4',
+    name: 'Farzana Akter',
+    email: 'farzana.debater@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS',
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-b',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-5',
+    name: 'Tanvir Hossain',
+    email: 'tanvir.debater@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS',
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-b',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'user-debater-6',
+    name: 'Abdur Rahim',
+    email: 'rahim.debater@gmail.com',
+    passwordHash: '$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS',
+    role: 'member',
+    isVerified: true,
+    status: 'active',
+    teamId: 'team-b',
+    panelRole: 'debater',
+    createdAt: new Date().toISOString(),
+  },
+];
+
+const initialSliders: SliderImage[] = [
+  {
+    id: 'slide-1',
+    url: 'https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&w=1920&q=80',
+    title: {
+      bn: 'ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ',
+      en: 'Debating Education Society in Bangladesh',
+    },
+    subtitle: {
+      bn: 'যুক্তি, শিক্ষা ও নেতৃত্বের জাতীয় প্ল্যাটফর্ম - তারুণ্যের যুক্তিনির্ভর বাংলাদেশ বিনির্মাণে',
+      en: 'National Platform for Rational Discourse, Education & Democratic Leadership',
+    },
+    showOverlay: true,
+    order: 1,
+    isActive: true,
+  },
+  {
+    id: 'slide-2',
+    url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1920&q=80',
+    title: {
+      bn: 'জাতীয় আন্তঃবিশ্ববিদ্যালয় সংসদীয় বিতর্ক চ্যাম্পিয়নশিপ',
+      en: 'National Inter-University Parliamentary Championship',
+    },
+    subtitle: {
+      bn: 'দেশসেরা তার্কিকদের যুক্তির লড়াই এবং বিশ্লেষণধর্মী বাকযুদ্ধের অনন্য মঞ্চ',
+      en: 'The Premier Arena for Bangladesh’s Finest Orators & Analytical Thinkers',
+    },
+    showOverlay: true,
+    order: 2,
+    isActive: true,
+  },
+  {
+    id: 'slide-3',
+    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80',
+    title: {
+      bn: 'তারুণ্যের ক্ষমতায়ন ও বাচনভঙ্গি প্রশিক্ষণ কর্মশালা',
+      en: 'Youth Empowerment & Public Speaking Masterclass',
+    },
+    subtitle: {
+      bn: 'বিতর্ক কৌশল, যুক্তি খণ্ডন ও তাৎক্ষণিক বক্তব্য উপস্থাপনায় বিশেষ প্রশিক্ষণ',
+      en: 'Expert Coaching in Debate Strategy, Refutation, and Eloquent Delivery',
+    },
+    showOverlay: true,
+    order: 3,
+    isActive: true,
+  },
+  {
+    id: 'slide-4',
+    url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80',
+    title: {
+      bn: 'গণতান্ত্রিক বিতর্ক ও মুক্তবুদ্ধির চর্চা',
+      en: 'Democratic Dialogue & Critical Thinking Forums',
+    },
+    subtitle: {
+      bn: 'যুক্তির আলোয় দূর হোক কুসংস্কার ও বৈষম্য',
+      en: 'Illuminating Society through Reasoning, Inclusivity & Truth',
+    },
+    showOverlay: false, // Per-image admin toggle to show or hide overlay on subsequent slides
+    order: 4,
+    isActive: true,
+  },
+];
+
+// Helper to create realistic sample dates relative to current run time
+const now = new Date();
+// Scheduled 10 minutes from now (unlocks in 3-5 mins!)
+const upcomingDebateTime = new Date(now.getTime() + 10 * 60 * 1000);
+// Today earlier (completed)
+const todayEarlier = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+// Yesterday completed
+const yesterday = new Date(now.getTime() - 26 * 60 * 60 * 1000);
+// Archive (3 days ago)
+const threeDaysAgo = new Date(now.getTime() - 72 * 60 * 60 * 1000);
+
+const initialDebates: Debate[] = [
+  {
+    id: 'debate-live-upcoming',
+    topic: {
+      bn: 'এই সংসদ মনে করে, শিক্ষাব্যবস্থায় এআই এর ব্যবহার শিক্ষার্থীদের মৌলিক সৃজনশীলতা হ্রাস করছে।',
+      en: 'This House believes that AI adoption in education diminishes foundational human creativity.',
+    },
+    category: {
+      bn: 'সংসদীয় বিতর্ক (জাতীয় রাউন্ড)',
+      en: 'Parliamentary Debate (National Round)',
+    },
+    scheduledAt: upcomingDebateTime.toISOString(),
+    durationMinutes: 60,
+    meetLink: 'https://meet.google.com/des-live-2026',
+    unlockMinutesBefore: 6, // Unlocks 6 minutes before scheduled start!
+    status: 'scheduled',
+    teamA: {
+      name: 'সরকারি দল (Team Alpha: ঢাকা বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-1', name: 'MD Zahid Hasan', email: 'zahidmaxshahi@gmail.com' },
+        { userId: 'user-debater-2', name: 'Sadia Sultana', email: 'sadia.debater@gmail.com' },
+        { userId: 'user-debater-3', name: 'Arif Hossain', email: 'arif.debater@gmail.com' },
+      ],
+    },
+    teamB: {
+      name: 'বিরোধী দল (Team Beta: জাহাঙ্গীরনগর বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-4', name: 'Farzana Akter', email: 'farzana.debater@gmail.com' },
+        { userId: 'user-debater-5', name: 'Tanvir Hossain', email: 'tanvir.debater@gmail.com' },
+        { userId: 'user-debater-6', name: 'Abdur Rahim', email: 'rahim.debater@gmail.com' },
+      ],
+    },
+    judges: [
+      { userId: 'user-admin', name: 'Admin Panel', email: 'admin@gmail.com', role: 'chairperson' },
+      { userId: 'user-mod', name: 'Moderator Council', email: 'moderator@gmail.com', role: 'vice_chairperson' },
+    ],
+    result: null,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'debate-today-completed',
+    topic: {
+      bn: 'এই সংসদ উন্নয়নশীল দেশসমূহে নবায়নযোগ্য জ্বালানি বিনিয়োগকে বাধ্যতামূলক করার প্রস্তাব সমর্থন করে।',
+      en: 'This House supports mandatory renewable energy investments for emerging economies.',
+    },
+    category: {
+      bn: 'পরিবেশ ও টেকসই উন্নয়ন বিতর্ক',
+      en: 'Climate & Sustainable Development League',
+    },
+    scheduledAt: todayEarlier.toISOString(),
+    durationMinutes: 50,
+    meetLink: 'https://meet.google.com/des-today-done',
+    unlockMinutesBefore: 5,
+    status: 'completed',
+    teamA: {
+      name: 'সরকারি দল (Team Aurora: বুয়েট বিতর্ক সংসদ)',
+      members: [
+        { userId: 'user-debater-1', name: 'MD Zahid Hasan', email: 'zahidmaxshahi@gmail.com' },
+        { userId: 'user-debater-2', name: 'Sadia Sultana', email: 'sadia.debater@gmail.com' },
+        { userId: 'user-debater-3', name: 'Arif Hossain', email: 'arif.debater@gmail.com' },
+      ],
+    },
+    teamB: {
+      name: 'বিরোধী দল (Team Zenith: চট্টগ্রাম বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-4', name: 'Farzana Akter', email: 'farzana.debater@gmail.com' },
+        { userId: 'user-debater-5', name: 'Tanvir Hossain', email: 'tanvir.debater@gmail.com' },
+        { userId: 'user-debater-6', name: 'Abdur Rahim', email: 'rahim.debater@gmail.com' },
+      ],
+    },
+    judges: [
+      { userId: 'user-admin', name: 'Admin Panel', email: 'admin@gmail.com', role: 'chairperson' },
+      { userId: 'user-mod', name: 'Moderator Council', email: 'moderator@gmail.com', role: 'vice_chairperson' },
+    ],
+    result: {
+      winnerTeam: 'teamA',
+      bestDebater: 'MD Zahid Hasan (সরকারি দল - প্রধানমন্ত্রী)',
+      scoreA: 84.5,
+      scoreB: 81.2,
+      publishedAt: todayEarlier.toISOString(),
+      judgeRemarks: {
+        bn: 'সরকারি দল অত্যন্ত যুক্তিগ্রাহ্য অর্থনৈতিক মডেল ও বাস্তবধর্মী পরিসংখ্যানের মাধ্যমে বিতর্কের অভিমুখ নিজেদের নিয়ন্ত্রণে রাখে। বিরোধী দলের যুক্তিখণ্ডন প্রশংসনীয় ছিল।',
+        en: 'The Government presented robust economic models and compelling empirics that anchored their case effectively. Opposition rebuttal was highly commended.',
+      },
+    },
+    createdAt: todayEarlier.toISOString(),
+  },
+  {
+    id: 'debate-yesterday-completed',
+    topic: {
+      bn: 'এই সংসদ মনে করে, সোশ্যাল মিডিয়া অ্যালগরিদম তরুণ সমাজের মনস্তাত্ত্বিক স্বাস্থ্যের জন্য সরাসরি ক্ষতিকর।',
+      en: 'This House believes that social media recommendation algorithms actively damage youth mental health.',
+    },
+    category: {
+      bn: 'মানসিক স্বাস্থ্য ও ডিজিটাল পলিসি বিতর্ক',
+      en: 'Digital Policy & Mental Health Forum',
+    },
+    scheduledAt: yesterday.toISOString(),
+    durationMinutes: 55,
+    meetLink: 'https://meet.google.com/des-yesterday',
+    unlockMinutesBefore: 7,
+    status: 'completed',
+    teamA: {
+      name: 'সরকারি দল (Team Titan: রাজশাহী বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-1', name: 'Sadia Sultana', email: 'sadia.debater@gmail.com' },
+        { userId: 'user-debater-2', name: 'Arif Hossain', email: 'arif.debater@gmail.com' },
+        { userId: 'user-debater-3', name: 'MD Zahid Hasan', email: 'zahidmaxshahi@gmail.com' },
+      ],
+    },
+    teamB: {
+      name: 'বিরোধী দল (Team Phoenix: খুলনা বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-4', name: 'Farzana Akter', email: 'farzana.debater@gmail.com' },
+        { userId: 'user-debater-5', name: 'Tanvir Hossain', email: 'tanvir.debater@gmail.com' },
+        { userId: 'user-debater-6', name: 'Abdur Rahim', email: 'rahim.debater@gmail.com' },
+      ],
+    },
+    judges: [
+      { userId: 'user-admin', name: 'Admin Panel', email: 'admin@gmail.com', role: 'chairperson' },
+    ],
+    result: {
+      winnerTeam: 'teamB',
+      bestDebater: 'Farzana Akter (বিরোধী দলনেতা)',
+      scoreA: 79.8,
+      scoreB: 83.4,
+      publishedAt: yesterday.toISOString(),
+      judgeRemarks: {
+        bn: 'বিরোধী দল ডিজিটাল সংযোগ ও সম্প্রদায় গঠনের ইতিবাচক দিকগুলো অত্যন্ত সাবলীলভাবে উপস্থাপন করে বিতর্কে বিজয়ী হয়।',
+        en: 'The Opposition effectively highlighted positive community formation and agency, securing a decisive victory with nuanced argumentation.',
+      },
+    },
+    createdAt: yesterday.toISOString(),
+  },
+  {
+    id: 'debate-archive-1',
+    topic: {
+      bn: 'এই সংসদ উন্নয়নশীল রাষ্ট্রে বিশ্ববিদ্যালয় পর্যায়ের সার্বজনীন অবৈতনিক উচ্চশিক্ষার পক্ষে।',
+      en: 'This House supports universal tuition-free higher education in developing nations.',
+    },
+    category: {
+      bn: 'শিক্ষা নীতি ও জাতীয় বাজেট বিতর্ক',
+      en: 'Education Policy & National Budget Series',
+    },
+    scheduledAt: threeDaysAgo.toISOString(),
+    durationMinutes: 60,
+    meetLink: 'https://meet.google.com/des-archive-1',
+    unlockMinutesBefore: 5,
+    status: 'completed',
+    teamA: {
+      name: 'সরকারি দল (Team Pioneer: নর্থ সাউথ বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-1', name: 'MD Zahid Hasan', email: 'zahidmaxshahi@gmail.com' },
+        { userId: 'user-debater-2', name: 'Sadia Sultana', email: 'sadia.debater@gmail.com' },
+        { userId: 'user-debater-3', name: 'Arif Hossain', email: 'arif.debater@gmail.com' },
+      ],
+    },
+    teamB: {
+      name: 'বিরোধী দল (Team Vanguard: ব্র্যাক বিশ্ববিদ্যালয়)',
+      members: [
+        { userId: 'user-debater-4', name: 'Farzana Akter', email: 'farzana.debater@gmail.com' },
+        { userId: 'user-debater-5', name: 'Tanvir Hossain', email: 'tanvir.debater@gmail.com' },
+        { userId: 'user-debater-6', name: 'Abdur Rahim', email: 'rahim.debater@gmail.com' },
+      ],
+    },
+    judges: [
+      { userId: 'user-admin', name: 'Admin Panel', email: 'admin@gmail.com', role: 'chairperson' },
+      { userId: 'user-mod', name: 'Moderator Council', email: 'moderator@gmail.com', role: 'vice_chairperson' },
+    ],
+    result: {
+      winnerTeam: 'teamA',
+      bestDebater: 'Sadia Sultana (সরকারদলীয় সদস্য)',
+      scoreA: 82.0,
+      scoreB: 80.5,
+      publishedAt: threeDaysAgo.toISOString(),
+      judgeRemarks: {
+        bn: 'সামাজিক সমতা ও মানবসম্পদ উন্নয়নে রাষ্ট্রীয় বিনিয়োগের গুরুত্ব প্রাঞ্জলভাবে তুলে ধরে সরকারি দল জয়লাভ করে।',
+        en: 'Government demonstrated strong analysis on human capital returns and equitable social mobility.',
+      },
+    },
+    createdAt: threeDaysAgo.toISOString(),
+  },
+];
+
+const initialMessages: ChatMessage[] = [
+  {
+    id: 'msg-1',
+    channelId: 'general',
+    senderId: 'user-admin',
+    senderName: 'Admin Panel (মডারেটর বোর্ড)',
+    senderEmail: 'admin@gmail.com',
+    senderRole: 'admin',
+    panelRole: 'chairperson',
+    message: 'ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ-এর সার্বজনীন সাধারণ চ্যাটরুমে সকলকে স্বাগতম! এখানে যুক্তিবাদী আলোচনা ও যেকোনো গঠনমূলক প্রশ্ন করা যাবে। সবাইকে বিতর্ক শিষ্টাচার বজায় রাখার অনুরোধ করা হলো।',
+    timestamp: new Date(now.getTime() - 120 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-2',
+    channelId: 'general',
+    senderId: 'user-debater-1',
+    senderName: 'MD Zahid Hasan',
+    senderEmail: 'zahidmaxshahi@gmail.com',
+    senderRole: 'member',
+    panelRole: 'debater',
+    message: 'শুভ অপরাহ্ন সবাইকে! আজকের সন্ধ্যার সংসদীয় বিতর্কের মোশনের প্রস্তুতি কেমন চলছে সবার?',
+    timestamp: new Date(now.getTime() - 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-3',
+    channelId: 'general',
+    senderId: 'user-debater-4',
+    senderName: 'Farzana Akter',
+    senderEmail: 'farzana.debater@gmail.com',
+    senderRole: 'member',
+    panelRole: 'debater',
+    message: 'দারুণ একটি মোশন! আমরা বিরোধী দলীয় টিম পুরোদমে প্রস্তুতি সম্পন্ন করেছি। আশা করি রোমাঞ্চকর বিতর্ক উপভোগ করব।',
+    timestamp: new Date(now.getTime() - 30 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-team-a-1',
+    channelId: 'debate-live-upcoming_teamA',
+    senderId: 'user-debater-1',
+    senderName: 'MD Zahid Hasan',
+    senderEmail: 'zahidmaxshahi@gmail.com',
+    senderRole: 'member',
+    panelRole: 'debater',
+    message: 'টিম আলফা (সরকারি দল): আমি প্রধানমন্ত্রী হিসেবে মোশন সংজ্ঞায়ন ও ফ্রেমওয়ার্ক দেব। সাদিয়া ডেপুটি হিসেবে এক্সটেনশন ও রিবাটাল দেবে। আরিফ হুইপ হিসেবে সামারাইজ করবে।',
+    timestamp: new Date(now.getTime() - 40 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-team-a-2',
+    channelId: 'debate-live-upcoming_teamA',
+    senderId: 'user-debater-2',
+    senderName: 'Sadia Sultana',
+    senderEmail: 'sadia.debater@gmail.com',
+    senderRole: 'member',
+    panelRole: 'debater',
+    message: 'পারফেক্ট প্ল্যান ভাইয়া! আমি এডুকেশনাল সাইকোলজি ও কেস স্টাডি তথ্যগুলো প্রস্তুত রেখেছি।',
+    timestamp: new Date(now.getTime() - 25 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-team-b-1',
+    channelId: 'debate-live-upcoming_teamB',
+    senderId: 'user-debater-4',
+    senderName: 'Farzana Akter',
+    senderEmail: 'farzana.debater@gmail.com',
+    senderRole: 'member',
+    panelRole: 'debater',
+    message: 'টিম বেটা (বিরোধী দল): আমাদের মূল ফোকাস থাকবে এআই-কে টুল হিসেবে দেখা, ক্রিয়েটিভিটি শেষ করার হাতিয়ার নয়। আমরা মেটা-লার্নিং স্টাডিজের রেফারেন্স টানব।',
+    timestamp: new Date(now.getTime() - 35 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'msg-panel-1',
+    channelId: 'debate-live-upcoming_panel',
+    senderId: 'user-admin',
+    senderName: 'Admin Panel (স্পিকার)',
+    senderEmail: 'admin@gmail.com',
+    senderRole: 'admin',
+    panelRole: 'chairperson',
+    message: 'সম্মানিত বিচারকমণ্ডলী, বিতর্কের নির্ধারিত সময়ের ঠিক ৬ মিনিট পূর্বে মিট লিঙ্ক অটোমেটিক আনলক হবে। টিম মেম্বারদের উপস্থিতি যাচাই করে প্রস্তুত থাকুন।',
+    timestamp: new Date(now.getTime() - 15 * 60 * 1000).toISOString(),
+  },
+];
+
+export function getDatabase(): DatabaseSchema {
+  if (inMemoryDb) {
+    return inMemoryDb;
+  }
+
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+
+    if (fs.existsSync(DB_FILE)) {
+      const data = fs.readFileSync(DB_FILE, 'utf-8');
+      inMemoryDb = JSON.parse(data);
+      return inMemoryDb!;
+    }
+  } catch (err) {
+    console.warn('Filesystem access failed or in serverless environment, using memory fallback:', err);
+  }
+
+  // Fallback to fresh initial state
+  inMemoryDb = {
+    users: initialUsers,
+    otps: [],
+    sliders: initialSliders,
+    debates: initialDebates,
+    messages: initialMessages,
+    settings: initialSettings,
+  };
+
+  saveDatabase(inMemoryDb);
+  return inMemoryDb;
+}
+
+export function saveDatabase(data: DatabaseSchema): void {
+  inMemoryDb = data;
+  try {
+    if (!fs.existsSync(DB_DIR)) {
+      fs.mkdirSync(DB_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    // In serverless environments like Vercel with ephemeral filesystem, memory fallback handles it
+    console.warn('Could not write to disk, preserved in memory:', err);
+  }
+}
