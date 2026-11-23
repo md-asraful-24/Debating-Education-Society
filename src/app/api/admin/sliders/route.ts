@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         title: slider.title || { bn: '', en: '' },
         subtitle: slider.subtitle || { bn: '', en: '' },
         showOverlay: slider.showOverlay ?? true,
+        durationSeconds: Number(slider.durationSeconds) || 15,
         order: db.sliders.length + 1,
         isActive: true,
       };
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
         if (slider.title !== undefined) existing.title = slider.title;
         if (slider.subtitle !== undefined) existing.subtitle = slider.subtitle;
         if (slider.showOverlay !== undefined) existing.showOverlay = slider.showOverlay;
+        if (slider.durationSeconds !== undefined) existing.durationSeconds = Number(slider.durationSeconds) || 15;
         if (slider.order !== undefined) existing.order = slider.order;
         if (slider.isActive !== undefined) existing.isActive = slider.isActive;
       }

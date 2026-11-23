@@ -16,7 +16,8 @@ export default function HeroCarousel({ initialSliders }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const SLIDE_DURATION_MS = 30000; // 30 seconds auto-slide requirement
+  // Auto-set duration to 15 seconds (15s) requirement
+  const DEFAULT_SLIDE_DURATION_MS = 15000;
   const TICK_INTERVAL_MS = 100;
 
   useEffect(() => {
@@ -32,14 +33,17 @@ export default function HeroCarousel({ initialSliders }: HeroCarouselProps) {
     }
   }, [initialSliders]);
 
-  // 30-Second Auto Slide Timer with continuous progress bar
+  // 15-Second Auto Slide Timer with continuous smooth progress
   useEffect(() => {
     if (sliders.length <= 1) return;
+
+    const currentSlide = sliders[currentIndex];
+    const slideDuration = currentSlide?.durationSeconds ? currentSlide.durationSeconds * 1000 : DEFAULT_SLIDE_DURATION_MS;
 
     setProgress(0);
     const progressTimer = setInterval(() => {
       setProgress((prev) => {
-        const next = prev + (TICK_INTERVAL_MS / SLIDE_DURATION_MS) * 100;
+        const next = prev + (TICK_INTERVAL_MS / slideDuration) * 100;
         if (next >= 100) {
           setCurrentIndex((idx) => (idx + 1) % sliders.length);
           return 0;
@@ -49,7 +53,7 @@ export default function HeroCarousel({ initialSliders }: HeroCarouselProps) {
     }, TICK_INTERVAL_MS);
 
     return () => clearInterval(progressTimer);
-  }, [currentIndex, sliders.length]);
+  }, [currentIndex, sliders]);
 
   if (sliders.length === 0) {
     return (
@@ -170,7 +174,7 @@ export default function HeroCarousel({ initialSliders }: HeroCarouselProps) {
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      {/* Bottom Bar: Indicators & 30-Second Countdown Timer */}
+      {/* Bottom Bar: Clean Indicators without ticking seconds */}
       <div className="absolute bottom-4 left-0 right-0 px-6 flex items-center justify-between pointer-events-none">
         {/* Indicators */}
         <div className="flex items-center gap-2 pointer-events-auto">
@@ -189,14 +193,15 @@ export default function HeroCarousel({ initialSliders }: HeroCarouselProps) {
           ))}
         </div>
 
-        {/* 30-Second Progress Indicator */}
-        <div className="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full border border-white/10 backdrop-blur-xs text-[11px] text-slate-300">
-          <Clock className="w-3 h-3 text-emerald-400" />
-          <span>{Math.ceil((100 - progress) * 0.3)}s</span>
+        {/* Clean Slide Counter (No ticking seconds counter on homepage) */}
+        <div className="flex items-center gap-1.5 bg-black/40 px-3 py-1 rounded-full border border-white/10 backdrop-blur-xs text-[11px] text-slate-300 font-bold">
+          <span>{currentIndex + 1}</span>
+          <span className="text-slate-500">/</span>
+          <span>{sliders.length}</span>
         </div>
       </div>
 
-      {/* Top 30-second progress bar line */}
+      {/* Top smooth 15-second visual progress line */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/10">
         <div
           className="h-full bg-theme-primary transition-all duration-100 ease-linear"

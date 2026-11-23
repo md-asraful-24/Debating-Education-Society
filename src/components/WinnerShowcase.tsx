@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { Debate } from '@/lib/types';
+import { Debate, WinningTeamMember } from '@/lib/types';
 import confetti from 'canvas-confetti';
 import {
   Trophy,
@@ -12,6 +12,11 @@ import {
   CheckCircle2,
   ChevronRight,
   Flame,
+  User,
+  Users,
+  Shield,
+  MessageSquareQuote,
+  Crown,
 } from 'lucide-react';
 
 interface WinnerShowcaseProps {
@@ -42,13 +47,6 @@ export default function WinnerShowcase({ showTitle = true }: WinnerShowcaseProps
       spread: 70,
       origin: { y: 0.6 },
     });
-  };
-
-  const getWinnerTeamName = (debate: Debate) => {
-    if (!debate.result) return '';
-    if (debate.result.winnerTeam === 'teamA') return debate.teamA.name;
-    if (debate.result.winnerTeam === 'teamB') return debate.teamB.name;
-    return language === 'bn' ? 'অমিমাংসিত (Draw)' : 'Draw';
   };
 
   return (
@@ -124,13 +122,13 @@ export default function WinnerShowcase({ showTitle = true }: WinnerShowcaseProps
         )}
 
         {activeTab === 'archive' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
             {archive.length > 0 ? (
               archive.map((debate) => (
-                <WinnerCard key={debate.id} debate={debate} isCompact />
+                <WinnerCard key={debate.id} debate={debate} />
               ))
             ) : (
-              <div className="col-span-full py-10 text-center text-slate-500 text-sm">
+              <div className="py-10 text-center text-slate-500 text-sm">
                 {t('noResultsYet')}
               </div>
             )}
@@ -145,22 +143,42 @@ function WinnerCard({
   debate,
   badgeLabel,
   isHighlighted = false,
-  isCompact = false,
 }: {
   debate: Debate;
   badgeLabel?: string;
   isHighlighted?: boolean;
-  isCompact?: boolean;
 }) {
   const { t, loc, language } = useLanguage();
   if (!debate.result) return null;
 
-  const winnerTeamName =
+  const defaultWinnerTeamName =
     debate.result.winnerTeam === 'teamA'
       ? debate.teamA.name
       : debate.result.winnerTeam === 'teamB'
       ? debate.teamB.name
-      : 'Draw';
+      : language === 'bn' ? 'অমিমাংসিত (Draw)' : 'Draw';
+
+  const winningTeamName = debate.result.winningTeamName || defaultWinnerTeamName;
+
+  // Resolve 3 winning members and their roles
+  let members: WinningTeamMember[] = debate.result.winningMembers || [];
+  if (members.length === 0) {
+    const rawMembers =
+      debate.result.winnerTeam === 'teamA'
+        ? debate.teamA.members
+        : debate.result.winnerTeam === 'teamB'
+        ? debate.teamB.members
+        : [];
+    const defaultRoles = [
+      language === 'bn' ? 'প্রধানমন্ত্রী / দলনেতা' : 'Prime Minister / Leader',
+      language === 'bn' ? 'উপনেতা / উপ-দলনেতা' : 'Deputy Leader',
+      language === 'bn' ? 'সদস্য / সমাপনী বক্তা' : 'Member / Whip',
+    ];
+    members = rawMembers.slice(0, 3).map((m, idx) => ({
+      name: m.name,
+      role: defaultRoles[idx] || (language === 'bn' ? 'সদস্য' : 'Member'),
+    }));
+  }
 
   const dateStr = new Date(debate.scheduledAt).toLocaleDateString(
     language === 'bn' ? 'bn-BD' : 'en-US',
@@ -173,86 +191,160 @@ function WinnerCard({
 
   return (
     <div
-      className={`rounded-2xl transition-all overflow-hidden ${
+      className={`rounded-3xl transition-all overflow-hidden ${
         isHighlighted
           ? 'bg-gradient-to-br from-amber-500/10 via-emerald-500/5 to-slate-900/5 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-500/40 shadow-xl'
           : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm'
       }`}
     >
+      {/* Top Banner with Badge & Date */}
       {badgeLabel && (
-        <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-5 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider">
+        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-white px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-black text-xs sm:text-sm uppercase tracking-wider">
             <Trophy className="w-4 h-4 text-white animate-bounce" />
             <span>{badgeLabel}</span>
           </div>
-          <span className="text-xs font-semibold opacity-90">{dateStr}</span>
+          <span className="text-xs font-bold opacity-95 bg-black/20 px-3 py-1 rounded-full">{dateStr}</span>
         </div>
       )}
 
-      <div className="p-6 space-y-4">
+      <div className="p-6 sm:p-8 space-y-6">
+        {/* Debate Topic */}
         <div>
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1 uppercase tracking-wider">
             {t('debateTopic')}
           </span>
-          <h3 className="text-base sm:text-xl font-bold text-slate-900 dark:text-white leading-snug">
+          <h3 className="text-base sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
             {loc(debate.topic)}
           </h3>
+          {debate.category && (
+            <span className="inline-block mt-1 text-[11px] font-semibold text-theme-primary">
+              • {loc(debate.category)}
+            </span>
+          )}
         </div>
 
-        {/* Winner Announcement Banner */}
-        <div className="p-4 rounded-xl bg-amber-500/15 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-              <Trophy className="w-4 h-4" />
-              <span>{t('winnerTeam')}</span>
-            </span>
-            <div className="text-lg font-black text-slate-900 dark:text-white">
-              {winnerTeamName}
+        {/* ─── Structured Layout: Winning Team (Left) + Best Speaker Side Panel (Right) ─── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          
+          {/* LEFT 2 COLUMNS: Winning Team Card + 3 Members & Specific Roles */}
+          <div className="lg:col-span-2 rounded-2xl bg-gradient-to-br from-amber-500/10 via-white to-slate-50 dark:from-amber-950/30 dark:via-slate-900 dark:to-slate-900/80 p-5 sm:p-6 border border-amber-500/30 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-amber-500/20">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-600/30">
+                    <Crown className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 block">
+                      {t('winnerTeam')} / চ্যাম্পিয়ন দল
+                    </span>
+                    <h4 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                      {winningTeamName}
+                    </h4>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Scores */}
+              <div className="flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-amber-500/30 shrink-0 self-start sm:self-auto shadow-xs">
+                <div className="text-center">
+                  <span className="text-[10px] text-slate-500 font-bold block">Team A</span>
+                  <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white font-mono">
+                    {debate.result.scoreA}
+                  </span>
+                </div>
+                <span className="text-amber-500 font-black text-sm">:</span>
+                <div className="text-center">
+                  <span className="text-[10px] text-slate-500 font-bold block">Team B</span>
+                  <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white font-mono">
+                    {debate.result.scoreB}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* List of 3 Winning Team Members with Positions / Roles */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-theme-primary" />
+                  <span>
+                    {language === 'bn' ? 'বিজয়ী দলের ৩ সদস্য ও অবস্থান/দায়িত্ব:' : 'Winning Team Members & Specific Positions:'}
+                  </span>
+                </span>
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                  3 Members
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {members.map((member, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-xs flex flex-col justify-between space-y-2 hover:border-amber-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white shrink-0 ${
+                        idx === 0
+                          ? 'bg-gradient-to-br from-amber-500 to-orange-600'
+                          : idx === 1
+                          ? 'bg-gradient-to-br from-emerald-500 to-teal-600'
+                          : 'bg-gradient-to-br from-blue-500 to-indigo-600'
+                      }`}>
+                        {idx + 1}
+                      </div>
+                      <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                        {member.name || `Member ${idx + 1}`}
+                      </span>
+                    </div>
+
+                    <div className="pt-1 border-t border-slate-100 dark:border-slate-700/60">
+                      <span className="inline-block px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[10px] font-bold tracking-tight border border-amber-200 dark:border-amber-800/50">
+                        {member.role || (language === 'bn' ? 'সদস্য' : 'Debater')}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Scores */}
-          <div className="flex items-center gap-3 bg-white/80 dark:bg-slate-800/80 px-4 py-2 rounded-xl border border-amber-500/20">
-            <div className="text-center">
-              <span className="text-[10px] text-slate-500 font-bold block">Team A</span>
-              <span className="text-base font-extrabold text-slate-800 dark:text-slate-200 font-mono">
-                {debate.result.scoreA}
-              </span>
+          {/* RIGHT 1 COLUMN: Dedicated Side Panel Highlighting Best Speaker (সেরা বক্তা) */}
+          <div className="lg:col-span-1 h-full rounded-2xl bg-gradient-to-br from-emerald-500/10 via-white to-slate-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900/80 p-5 sm:p-6 border-2 border-emerald-500/30 shadow-xs flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{language === 'bn' ? 'সেরা বক্তা' : 'Best Speaker'}</span>
+                </span>
+                <Trophy className="w-4 h-4 text-emerald-500" />
+              </div>
+
+              <div className="pt-2">
+                <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
+                  {t('bestDebater')} / সেরা তার্কিক
+                </span>
+                <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug mt-1 text-emerald-600 dark:text-emerald-400">
+                  {debate.result.bestDebater || (language === 'bn' ? 'ঘোষিত হয়নি' : 'To be announced')}
+                </div>
+              </div>
             </div>
-            <span className="text-slate-400 font-bold">:</span>
-            <div className="text-center">
-              <span className="text-[10px] text-slate-500 font-bold block">Team B</span>
-              <span className="text-base font-extrabold text-slate-800 dark:text-slate-200 font-mono">
-                {debate.result.scoreB}
-              </span>
-            </div>
+
+            {/* Adjudication Feedback Note / Remarks */}
+            {debate.result.judgeRemarks && (
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-700/80 space-y-1">
+                <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                  <MessageSquareQuote className="w-3 h-3 text-slate-400" />
+                  <span>{t('judgeFeedback')}</span>
+                </span>
+                <p className="text-xs text-slate-600 dark:text-slate-300 italic line-clamp-4 leading-relaxed">
+                  &ldquo;{loc(debate.result.judgeRemarks)}&rdquo;
+                </p>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Best Debater */}
-        {debate.result.bestDebater && (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-            <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <div>
-              <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide block">
-                {t('bestDebater')}
-              </span>
-              <span className="text-sm font-extrabold text-slate-900 dark:text-white">
-                {debate.result.bestDebater}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Judge Remarks */}
-        {debate.result.judgeRemarks && (
-          <div className="text-xs text-slate-600 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
-            <span className="font-semibold not-italic block text-slate-800 dark:text-slate-200 mb-0.5">
-              {t('judgeFeedback')}:
-            </span>
-            &ldquo;{loc(debate.result.judgeRemarks)}&rdquo;
-          </div>
-        )}
       </div>
     </div>
   );

@@ -25,7 +25,14 @@ export async function POST(request: Request) {
     debate.status = 'completed';
     debate.result = {
       winnerTeam: result.winnerTeam,
-      bestDebater: result.bestDebater || '',
+      winningTeamName: result.winningTeamName?.trim() || '',
+      winningMembers: Array.isArray(result.winningMembers)
+        ? result.winningMembers.map((m: { name?: string; role?: string }) => ({
+            name: m.name?.trim() || '',
+            role: m.role?.trim() || '',
+          }))
+        : [],
+      bestDebater: result.bestDebater?.trim() || '',
       scoreA: Number(result.scoreA) || 0,
       scoreB: Number(result.scoreB) || 0,
       publishedAt: new Date().toISOString(),

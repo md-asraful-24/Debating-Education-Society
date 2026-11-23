@@ -194,7 +194,7 @@
       "durationMinutes": 60,
       "meetLink": "https://meet.google.com/des-live-2026",
       "unlockMinutesBefore": 6,
-      "status": "scheduled",
+      "status": "completed",
       "teamA": {
         "name": "সরকারি দল (Team Alpha: ঢাকা বিশ্ববিদ্যালয়)",
         "members": [
@@ -249,7 +249,19 @@
           "role": "vice_chairperson"
         }
       ],
-      "result": null,
+      "result": {
+        "winnerTeam": "draw",
+        "bestDebater": "Dr. Shahriar Rahman",
+        "scoreA": 82.5,
+        "scoreB": 80,
+        "publishedAt": "2026-11-23T02:35:27.774Z",
+        "judgeRemarks": {
+          "bn": "",
+          "en": ""
+        },
+        "winningTeamName": "অমিমাংসিত (Draw)",
+        "winningMembers": []
+      },
       "createdAt": "2026-11-23T01:36:38.287Z"
     },
     {
@@ -330,7 +342,22 @@
         "judgeRemarks": {
           "bn": "সরকারি দল অত্যন্ত যুক্তিগ্রাহ্য অর্থনৈতিক মডেল ও বাস্তবধর্মী পরিসংখ্যানের মাধ্যমে বিতর্কের অভিমুখ নিজেদের নিয়ন্ত্রণে রাখে। বিরোধী দলের যুক্তিখণ্ডন প্রশংসনীয় ছিল।",
           "en": "The Government presented robust economic models and compelling empirics that anchored their case effectively. Opposition rebuttal was highly commended."
-        }
+        },
+        "winningTeamName": "সরকারি দল (Team Aurora: বুয়েট বিতর্ক সংসদ)",
+        "winningMembers": [
+          {
+            "name": "MD Zahid Hasan",
+            "role": "প্রধানমন্ত্রী / দলনেতা (Leader / Prime Minister)"
+          },
+          {
+            "name": "Sadia Sultana",
+            "role": "উপনেতা (Deputy Leader)"
+          },
+          {
+            "name": "Arif Hossain",
+            "role": "সদস্য (Team Member)"
+          }
+        ]
       },
       "createdAt": "2026-11-22T21:36:38.287Z"
     },
@@ -406,7 +433,22 @@
         "judgeRemarks": {
           "bn": "বিরোধী দল ডিজিটাল সংযোগ ও সম্প্রদায় গঠনের ইতিবাচক দিকগুলো অত্যন্ত সাবলীলভাবে উপস্থাপন করে বিতর্কে বিজয়ী হয়।",
           "en": "The Opposition effectively highlighted positive community formation and agency, securing a decisive victory with nuanced argumentation."
-        }
+        },
+        "winningTeamName": "বিরোধী দল (Team Phoenix: খুলনা বিশ্ববিদ্যালয়)",
+        "winningMembers": [
+          {
+            "name": "Farzana Akter",
+            "role": "প্রধানমন্ত্রী / দলনেতা (Leader / Prime Minister)"
+          },
+          {
+            "name": "Tanvir Hossain",
+            "role": "উপনেতা (Deputy Leader)"
+          },
+          {
+            "name": "Abdur Rahim",
+            "role": "সদস্য (Team Member)"
+          }
+        ]
       },
       "createdAt": "2026-11-21T23:36:38.287Z"
     },
@@ -488,7 +530,22 @@
         "judgeRemarks": {
           "bn": "সামাজিক সমতা ও মানবসম্পদ উন্নয়নে রাষ্ট্রীয় বিনিয়োগের গুরুত্ব প্রাঞ্জলভাবে তুলে ধরে সরকারি দল জয়লাভ করে।",
           "en": "Government demonstrated strong analysis on human capital returns and equitable social mobility."
-        }
+        },
+        "winningTeamName": "সরকারি দল (Team Pioneer: নর্থ সাউথ বিশ্ববিদ্যালয়)",
+        "winningMembers": [
+          {
+            "name": "MD Zahid Hasan",
+            "role": "প্রধানমন্ত্রী / দলনেতা (Leader / Prime Minister)"
+          },
+          {
+            "name": "Sadia Sultana",
+            "role": "উপনেতা (Deputy Leader)"
+          },
+          {
+            "name": "Arif Hossain",
+            "role": "সদস্য (Team Member)"
+          }
+        ]
       },
       "createdAt": "2026-11-20T01:36:38.287Z"
     }

@@ -39,6 +39,7 @@ export interface SliderImage {
   title: LocalizedString;
   subtitle: LocalizedString;
   showOverlay: boolean; // admin toggle to show/hide title/overlay text on subsequent slides
+  durationSeconds?: number; // auto-sets to 15 seconds (15s)
   order: number;
   isActive: boolean;
 }
@@ -61,8 +62,15 @@ export interface DebateTeam {
   members: DebateTeamMember[];
 }
 
+export interface WinningTeamMember {
+  name: string;
+  role: string; // e.g. "Prime Minister / প্রধানমন্ত্রী", "Deputy / উপনেতা", "Member / সদস্য"
+}
+
 export interface DebateResult {
-  winnerTeam: 'teamA' | 'teamB' | 'draw';
+  winnerTeam: 'teamA' | 'teamB' | 'draw' | string;
+  winningTeamName?: string; // custom manual or selected winning team name
+  winningMembers?: WinningTeamMember[]; // 3 members with specific roles/positions
   bestDebater?: string;
   scoreA: number;
   scoreB: number;

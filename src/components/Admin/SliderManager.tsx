@@ -15,6 +15,7 @@ export default function SliderManager() {
   const [newSubtitleBn, setNewSubtitleBn] = useState('');
   const [newSubtitleEn, setNewSubtitleEn] = useState('');
   const [newShowOverlay, setNewShowOverlay] = useState(true);
+  const [newDuration, setNewDuration] = useState<number | ''>(15);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const fetchSliders = async () => {
@@ -84,6 +85,7 @@ export default function SliderManager() {
             title: { bn: newTitleBn.trim(), en: newTitleEn.trim() },
             subtitle: { bn: newSubtitleBn.trim(), en: newSubtitleEn.trim() },
             showOverlay: newShowOverlay,
+            durationSeconds: Number(newDuration) || 15, // Auto-set 15 seconds (15s)
           },
         }),
       });
@@ -95,6 +97,7 @@ export default function SliderManager() {
         setNewTitleEn('');
         setNewSubtitleBn('');
         setNewSubtitleEn('');
+        setNewDuration(15);
         fetchSliders();
         setTimeout(() => setSaveStatus(null), 3000);
       }
@@ -138,6 +141,9 @@ export default function SliderManager() {
               <img src={s.url} alt={s.title.en} className="w-full h-full object-cover" />
               <div className="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded">
                 Slide #{idx + 1} {idx === 0 ? '(First - Always Prominent)' : ''}
+              </div>
+              <div className="absolute top-2 right-2 bg-emerald-600/80 text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded">
+                {s.durationSeconds || 15}s
               </div>
             </div>
 
@@ -247,17 +253,55 @@ export default function SliderManager() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="showOverlayCheck"
-            checked={newShowOverlay}
-            onChange={(e) => setNewShowOverlay(e.target.checked)}
-            className="rounded text-theme-primary focus:ring-emerald-500"
-          />
-          <label htmlFor="showOverlayCheck" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-            {t('adminToggleOverlay')}
-          </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+              Slide Duration (Seconds) / স্লাইড সময়সীমা (১৫ সেকেন্ড)
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={5}
+                max={60}
+                value={newDuration}
+                onChange={(e) => {
+                  const val = e.target.value === '' ? '' : Number(e.target.value);
+                  setNewDuration(val);
+                }}
+                onBlur={() => {
+                  if (newDuration === '' || newDuration <= 0) {
+                    setNewDuration(15);
+                  }
+                }}
+                placeholder="15"
+                className="w-28 px-3 py-2 text-xs rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold"
+              />
+              <button
+                type="button"
+                onClick={() => setNewDuration(15)}
+                className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-theme-primary text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+                title="Auto-set 15 seconds"
+              >
+                Auto-Set 15s
+              </button>
+            </div>
+            <span className="text-[10px] text-slate-400 mt-1 block">
+              ডিফল্ট ও রিকমেন্ডেড সময়সীমা: ১৫ সেকেন্ড (15s)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 pt-4">
+            <input
+              type="checkbox"
+              id="showOverlayCheck"
+              checked={newShowOverlay}
+              onChange={(e) => setNewShowOverlay(e.target.checked)}
+              className="rounded text-theme-primary focus:ring-emerald-500"
+            />
+            <label htmlFor="showOverlayCheck" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+              {t('adminToggleOverlay')}
+            </label>
+          </div>
         </div>
 
         <button

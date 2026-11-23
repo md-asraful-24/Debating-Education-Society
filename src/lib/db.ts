@@ -383,6 +383,12 @@ const initialDebates: Debate[] = [
     ],
     result: {
       winnerTeam: 'teamA',
+      winningTeamName: 'সরকারি দল (Team Aurora: বুয়েট বিতর্ক সংসদ)',
+      winningMembers: [
+        { name: 'MD Zahid Hasan', role: 'প্রধানমন্ত্রী (Prime Minister)' },
+        { name: 'Sadia Sultana', role: 'উপনেতা (Deputy Leader)' },
+        { name: 'Arif Hossain', role: 'সদস্য (Government Member)' },
+      ],
       bestDebater: 'MD Zahid Hasan (সরকারি দল - প্রধানমন্ত্রী)',
       scoreA: 84.5,
       scoreB: 81.2,
@@ -430,6 +436,12 @@ const initialDebates: Debate[] = [
     ],
     result: {
       winnerTeam: 'teamB',
+      winningTeamName: 'বিরোধী দল (Team Phoenix: খুলনা বিশ্ববিদ্যালয়)',
+      winningMembers: [
+        { name: 'Farzana Akter', role: 'বিরোধী দলীয় নেতা (Opposition Leader)' },
+        { name: 'Tanvir Hossain', role: 'উপনেতা (Deputy Leader)' },
+        { name: 'Abdur Rahim', role: 'সদস্য (Opposition Member)' },
+      ],
       bestDebater: 'Farzana Akter (বিরোধী দলনেতা)',
       scoreA: 79.8,
       scoreB: 83.4,
@@ -612,6 +624,39 @@ export function getDatabase(): DatabaseSchema {
 
       if (inMemoryDb && !inMemoryDb.settings.logoUrl) {
         inMemoryDb.settings.logoUrl = '/images/logo.jpg';
+      }
+
+      // Ensure debates with completed results have winningTeamName & winningMembers
+      if (inMemoryDb?.debates) {
+        inMemoryDb.debates.forEach((d) => {
+          if (d.status === 'completed' && d.result) {
+            if (!d.result.winningTeamName) {
+              d.result.winningTeamName =
+                d.result.winnerTeam === 'teamA'
+                  ? d.teamA.name
+                  : d.result.winnerTeam === 'teamB'
+                  ? d.teamB.name
+                  : 'অমিমাংসিত (Draw)';
+            }
+            if (!d.result.winningMembers || d.result.winningMembers.length === 0) {
+              const membersSrc =
+                d.result.winnerTeam === 'teamA'
+                  ? d.teamA.members
+                  : d.result.winnerTeam === 'teamB'
+                  ? d.teamB.members
+                  : [];
+              const defaultRoles = [
+                'প্রধানমন্ত্রী / দলনেতা (Leader / Prime Minister)',
+                'উপনেতা (Deputy Leader)',
+                'সদস্য (Team Member)',
+              ];
+              d.result.winningMembers = (membersSrc || []).slice(0, 3).map((m, idx) => ({
+                name: m.name,
+                role: defaultRoles[idx] || 'সদস্য (Team Member)',
+              }));
+            }
+          }
+        });
       }
 
       return inMemoryDb!;
