@@ -1,13 +1,24 @@
 {
   "users": [
     {
+      "id": "user-super-admin",
+      "name": "Super Admin (Explovia)",
+      "email": "exploviaweb.bd@gmail.com",
+      "passwordHash": "$2b$10$qfW.M0V8hWb7OJYwIf6WsuAKzmAjkaV7DJo6p2u24AyWxWkmpunIq",
+      "role": "super_admin",
+      "isVerified": true,
+      "status": "active",
+      "panelRole": "chairperson",
+      "createdAt": "2026-11-23T02:01:02.052Z"
+    },
+    {
       "id": "user-admin",
       "name": "Admin Panel",
       "email": "admin@gmail.com",
       "passwordHash": "$2b$10$qfW.M0V8hWb7OJYwIf6WsuAKzmAjkaV7DJo6p2u24AyWxWkmpunIq",
       "role": "admin",
       "isVerified": true,
-      "status": "active",
+      "status": "banned",
       "panelRole": "chairperson",
       "createdAt": "2026-11-23T01:36:38.285Z"
     },
@@ -18,7 +29,7 @@
       "passwordHash": "$2b$10$BHKkp2Zo3M9F1iTz1eqdie3f.4WtmX8r9Xzt1Zuo4VEZSt5coNYqa",
       "role": "moderator",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "panelRole": "vice_chairperson",
       "createdAt": "2026-11-23T01:36:38.287Z"
     },
@@ -29,7 +40,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-a",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -41,7 +52,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-a",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -53,7 +64,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-a",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -65,7 +76,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-b",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -77,7 +88,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-b",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -89,7 +100,7 @@
       "passwordHash": "$2b$10$GEc.n89asPnHqvuMTDc2n.8ssB736NnvTmsk4jVlYaNyumYBB3eYS",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "teamId": "team-b",
       "panelRole": "debater",
       "createdAt": "2026-11-23T01:36:38.287Z"
@@ -101,7 +112,7 @@
       "passwordHash": "$2b$10$Fo7sgUdE6LyetInWvcYeUerB/NjVJ55STrJk88hIXy00me2RarjVq",
       "role": "member",
       "isVerified": true,
-      "status": "active",
+      "status": "kicked",
       "createdAt": "2026-11-23T01:37:25.006Z"
     }
   ],
@@ -566,7 +577,7 @@
       "bn": "ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ",
       "en": "Debating Education Society in Bangladesh"
     },
-    "theme": "emerald",
+    "theme": "sunset",
     "officialGmail": "debatingeducationsociety.bd@gmail.com",
     "phone": "+880 1873-528395",
     "address": {
@@ -587,17 +598,6 @@
       "en": "Strict Code of Conduct & Anti-Harassment Policy:\nAny form of profanity, slurs, communal hatred, misogyny, harassment, or verbal abuse is strictly prohibited under our Zero Tolerance Policy. Violations will result in immediate disciplinary action including official warnings, room kicks, temporary bans, or permanent expulsion by the Admin Panel. Our debate society must remain a safe, respectful, and intellect-driven sanctuary."
     },
     "leadership": [
-      {
-        "id": "lead-1",
-        "name": "MD Zahid Hasan",
-        "role": {
-          "bn": "প্রধান পৃষ্ঠপোষক ও প্রতিষ্ঠাতা সভাপতি",
-          "en": "Chief Patron & Founding President"
-        },
-        "email": "zahidmaxshahi@gmail.com",
-        "phone": "+8801873528395",
-        "order": 1
-      },
       {
         "id": "lead-2",
         "name": "Dr. Shahriar Rahman",
@@ -629,6 +629,17 @@
         },
         "email": "tanvir.mod@gmail.com",
         "phone": "+8801912345678",
+        "order": 4
+      },
+      {
+        "id": "lead-1795399775825",
+        "name": "MD Asraful Islam",
+        "role": {
+          "bn": "যুগ্ম সাধারণ সম্পাদক",
+          "en": "Joint General Secretary"
+        },
+        "email": "officer@gmail.com",
+        "phone": "+8801...",
         "order": 4
       }
     ],

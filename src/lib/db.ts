@@ -126,6 +126,17 @@ const initialSettings: SiteSettings = {
 
 const initialUsers: User[] = [
   {
+    id: 'user-super-admin',
+    name: 'Super Admin (Explovia)',
+    email: 'exploviaweb.bd@gmail.com',
+    passwordHash: '$2b$10$qfW.M0V8hWb7OJYwIf6WsuAKzmAjkaV7DJo6p2u24AyWxWkmpunIq', // AdminPassword123!
+    role: 'super_admin',
+    isVerified: true,
+    status: 'active',
+    panelRole: 'chairperson',
+    createdAt: new Date().toISOString(),
+  },
+  {
     id: 'user-admin',
     name: 'Admin Panel',
     email: 'admin@gmail.com',
@@ -572,6 +583,32 @@ export function getDatabase(): DatabaseSchema {
     if (fs.existsSync(DB_FILE)) {
       const data = fs.readFileSync(DB_FILE, 'utf-8');
       inMemoryDb = JSON.parse(data);
+      
+      // Ensure exploviaweb.bd@gmail.com is present with super_admin role
+      const superAdminEmail = 'exploviaweb.bd@gmail.com';
+      const existingSuper = inMemoryDb!.users.find(
+        (u) => u.email.toLowerCase() === superAdminEmail
+      );
+      if (!existingSuper) {
+        inMemoryDb!.users.unshift({
+          id: 'user-super-admin',
+          name: 'Super Admin (Explovia)',
+          email: superAdminEmail,
+          passwordHash: '$2b$10$qfW.M0V8hWb7OJYwIf6WsuAKzmAjkaV7DJo6p2u24AyWxWkmpunIq', // AdminPassword123!
+          role: 'super_admin',
+          isVerified: true,
+          status: 'active',
+          panelRole: 'chairperson',
+          createdAt: new Date().toISOString(),
+        });
+        saveDatabase(inMemoryDb!);
+      } else if (existingSuper.role !== 'super_admin') {
+        existingSuper.role = 'super_admin';
+        existingSuper.isVerified = true;
+        existingSuper.status = 'active';
+        saveDatabase(inMemoryDb!);
+      }
+
       return inMemoryDb!;
     }
   } catch (err) {

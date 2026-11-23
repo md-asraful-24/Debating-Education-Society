@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'moderator', 'member')),
+    role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('super_admin', 'admin', 'moderator', 'member')),
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'kicked', 'banned')),
     team_id TEXT,

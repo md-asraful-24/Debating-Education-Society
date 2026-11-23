@@ -75,6 +75,7 @@ export default function LoginPage() {
             <span>{language === 'bn' ? 'ডেমো টেস্ট অ্যাকাউন্টসমূহ:' : 'Quick Testing Accounts:'}</span>
           </div>
           <div className="text-slate-600 dark:text-slate-400 font-mono text-[11px] space-y-0.5">
+            <div>• Super Admin: <span className="text-slate-800 dark:text-slate-200 font-bold">exploviaweb.bd@gmail.com</span> / <span className="text-slate-800 dark:text-slate-200 font-bold">AdminPassword123!</span></div>
             <div>• Admin: <span className="text-slate-800 dark:text-slate-200 font-bold">admin@gmail.com</span> / <span className="text-slate-800 dark:text-slate-200 font-bold">AdminPassword123!</span></div>
             <div>• Debater: <span className="text-slate-800 dark:text-slate-200 font-bold">zahidmaxshahi@gmail.com</span> / <span className="text-slate-800 dark:text-slate-200 font-bold">DebaterPassword123!</span></div>
           </div>

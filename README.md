@@ -100,6 +100,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Role | Gmail Address | Password | Permissions |
 | :--- | :--- | :--- | :--- |
+| **Super Admin** | `exploviaweb.bd@gmail.com` | `AdminPassword123!` | Complete system authority, super admin promotion & ownership transfer |
 | **Admin** | `admin@gmail.com` | `AdminPassword123!` | Full control over sliders, debates, users, results, footer, and themes |
 | **Moderator** | `moderator@gmail.com` | `ModeratorPassword123!` | Panel adjudicator & moderation privileges |
 | **Debater 1** | `zahidmaxshahi@gmail.com` | `DebaterPassword123!` | Assigned to Team Alpha (Government) |

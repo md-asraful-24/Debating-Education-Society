@@ -199,8 +199,13 @@ export default function Sidebar() {
                   {user.email}
                 </div>
               </div>
+              {user.role === 'super_admin' && (
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-white uppercase shrink-0 flex items-center gap-1">
+                  <span>Super Admin</span>
+                </span>
+              )}
               {user.role === 'admin' && (
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-white uppercase shrink-0">
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-600 text-white uppercase shrink-0">
                   Admin
                 </span>
               )}

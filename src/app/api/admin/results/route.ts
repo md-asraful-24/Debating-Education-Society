@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getDatabase, saveDatabase } from '@/lib/db';
-import { getCurrentUserFromRequest } from '@/lib/auth';
+import { getCurrentUserFromRequest, hasAdminPrivileges } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
     const user = getCurrentUserFromRequest(request);
-    if (!user || user.role !== 'admin') {
+    if (!user || !hasAdminPrivileges(user)) {
       return NextResponse.json({ error: 'Admin access required.' }, { status: 403 });
     }
 

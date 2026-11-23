@@ -97,8 +97,11 @@ export default function AdminPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-            Logged as: <strong className="font-mono text-emerald-600">{user?.email}</strong>
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <span>Logged as: <strong className="font-mono text-emerald-600">{user?.email}</strong></span>
+            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${user?.role === 'super_admin' ? 'bg-amber-500 text-white' : 'bg-blue-600 text-white'}`}>
+              {user?.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+            </span>
           </span>
         </div>
       </div>

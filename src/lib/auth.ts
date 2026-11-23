@@ -71,6 +71,16 @@ export function getCurrentUserFromRequest(request: Request): User | null {
   return user || null;
 }
 
+export function hasAdminPrivileges(user: User | null): boolean {
+  if (!user || user.status === 'banned' || user.status === 'kicked') return false;
+  return user.role === 'admin' || user.role === 'super_admin' || user.email.toLowerCase() === 'exploviaweb.bd@gmail.com';
+}
+
+export function isSuperAdmin(user: User | null): boolean {
+  if (!user || user.status === 'banned' || user.status === 'kicked') return false;
+  return user.role === 'super_admin' || user.email.toLowerCase() === 'exploviaweb.bd@gmail.com';
+}
+
 export function generateOTP(): string {
   // Cryptographically sound 6-digit OTP
   return Math.floor(100000 + Math.random() * 900000).toString();

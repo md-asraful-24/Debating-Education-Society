@@ -6,6 +6,7 @@ import { User } from '@/lib/types';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isSuperAdmin: boolean;
   isAdmin: boolean;
   isModerator: boolean;
   refreshUser: () => Promise<void>;
@@ -48,11 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const isAdmin = user?.role === 'admin';
-  const isModerator = user?.role === 'admin' || user?.role === 'moderator';
+  const isSuperAdmin =
+    user?.role === 'super_admin' || user?.email.toLowerCase() === 'exploviaweb.bd@gmail.com';
+  const isAdmin = user?.role === 'admin' || Boolean(isSuperAdmin);
+  const isModerator = Boolean(isAdmin) || user?.role === 'moderator';
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, isModerator, refreshUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, isSuperAdmin, isAdmin, isModerator, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

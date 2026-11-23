@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
-import { getCurrentUserFromRequest } from '@/lib/auth';
+import { getCurrentUserFromRequest, hasAdminPrivileges } from '@/lib/auth';
 
 export async function GET(
   request: Request,
@@ -22,7 +22,7 @@ export async function GET(
     const endTime = scheduledTime + (debate.durationMinutes || 60) * 60 * 1000 + 30 * 60 * 1000;
 
     const isUnlocked = now >= unlockTime && now <= endTime;
-    const isAdmin = user?.role === 'admin';
+    const isAdmin = hasAdminPrivileges(user);
 
     // Strict server-side time-window enforcement
     if (!isUnlocked && !isAdmin) {

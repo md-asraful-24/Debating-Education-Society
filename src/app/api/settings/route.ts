@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDatabase, saveDatabase } from '@/lib/db';
-import { getCurrentUserFromRequest } from '@/lib/auth';
+import { getCurrentUserFromRequest, hasAdminPrivileges } from '@/lib/auth';
 
 export async function GET() {
   const db = getDatabase();
@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const user = getCurrentUserFromRequest(request);
-    if (!user || user.role !== 'admin') {
+    if (!user || !hasAdminPrivileges(user)) {
       return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
     }
 

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getDatabase, saveDatabase } from '@/lib/db';
-import { getCurrentUserFromRequest } from '@/lib/auth';
+import { getCurrentUserFromRequest, hasAdminPrivileges, isSuperAdmin } from '@/lib/auth';
 
 export async function GET(request: Request) {
   const user = getCurrentUserFromRequest(request);
-  if (!user || user.role !== 'admin') {
+  if (!user || !hasAdminPrivileges(user)) {
     return NextResponse.json({ error: 'Admin access required.' }, { status: 403 });
   }
 
@@ -21,17 +21,21 @@ export async function GET(request: Request) {
     createdAt: u.createdAt,
   }));
 
-  return NextResponse.json({ users: sanitizedUsers });
+  return NextResponse.json({
+    users: sanitizedUsers,
+    currentUserRole: user.role,
+    isSuperAdmin: isSuperAdmin(user),
+  });
 }
 
 export async function POST(request: Request) {
   try {
     const user = getCurrentUserFromRequest(request);
-    if (!user || user.role !== 'admin') {
+    if (!user || !hasAdminPrivileges(user)) {
       return NextResponse.json({ error: 'Admin access required.' }, { status: 403 });
     }
 
-    const { userId, action, role, teamId, panelRole } = await request.json();
+    const { userId, action, role, teamId, panelRole, transferOwnership } = await request.json();
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID is required.' }, { status: 400 });
@@ -44,9 +48,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
     }
 
-    // Protect master admin from being kicked/banned/demoted
-    if (target.email === 'admin@gmail.com' && (action === 'ban' || action === 'kick' || role === 'member')) {
-      return NextResponse.json({ error: 'Primary admin account cannot be restricted.' }, { status: 400 });
+    const callerIsSuperAdmin = isSuperAdmin(user);
+    const targetIsSuperAdmin = isSuperAdmin(target);
+
+    // Protection rule 1: Regular admin cannot modify, kick, ban, or demote a Super Admin
+    if (targetIsSuperAdmin && !callerIsSuperAdmin) {
+      return NextResponse.json(
+        { error: 'Permission denied: Only a Super Admin can modify another Super Admin.' },
+        { status: 403 }
+      );
+    }
+
+    // Protection rule 2: Initial super admin account exploviaweb.bd@gmail.com cannot be banned or kicked
+    if (target.email.toLowerCase() === 'exploviaweb.bd@gmail.com' && (action === 'ban' || action === 'kick')) {
+      return NextResponse.json(
+        { error: 'Primary Super Admin account cannot be restricted or banned.' },
+        { status: 400 }
+      );
+    }
+
+    // RBAC Rule 3: Privilege Escalation Prevention - Only Super Admin can assign super_admin role
+    if (role === 'super_admin' || action === 'promoteSuperAdmin' || action === 'transferSuperAdmin') {
+      if (!callerIsSuperAdmin) {
+        return NextResponse.json(
+          { error: 'Privilege escalation rejected: Only the Super Admin can grant or transfer the super_admin role.' },
+          { status: 403 }
+        );
+      }
     }
 
     if (action === 'ban') {
@@ -55,8 +83,28 @@ export async function POST(request: Request) {
       target.status = 'kicked';
     } else if (action === 'activate') {
       target.status = 'active';
+    } else if (action === 'promoteSuperAdmin') {
+      target.role = 'super_admin';
+      target.isVerified = true;
+      target.status = 'active';
+      if (transferOwnership) {
+        // Transfer ownership: current user steps down to admin
+        const currentInDb = db.users.find((u) => u.id === user.id);
+        if (currentInDb && currentInDb.id !== target.id) {
+          currentInDb.role = 'admin';
+        }
+      }
     } else if (action === 'updateRole') {
-      if (role) target.role = role;
+      if (role) {
+        // Enforce RBAC on role change
+        if (role === 'super_admin' && !callerIsSuperAdmin) {
+          return NextResponse.json(
+            { error: 'Only Super Admin can promote a user to super_admin.' },
+            { status: 403 }
+          );
+        }
+        target.role = role;
+      }
       if (teamId !== undefined) target.teamId = teamId;
       if (panelRole !== undefined) target.panelRole = panelRole;
     }
