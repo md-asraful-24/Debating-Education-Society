@@ -62,3 +62,63 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create debate.' }, { status: 500 });
   }
 }
+
+export async function PUT(request: Request) {
+  try {
+    const user = getCurrentUserFromRequest(request);
+    if (!user || !hasAdminPrivileges(user)) {
+      return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { id, topic, scheduledAt, meetLink, unlockMinutesBefore, status } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Debate ID is required.' }, { status: 400 });
+    }
+
+    const db = getDatabase();
+    const debate = db.debates.find((d) => d.id === id);
+
+    if (!debate) {
+      return NextResponse.json({ error: 'Debate not found.' }, { status: 404 });
+    }
+
+    if (topic) debate.topic = topic;
+    if (scheduledAt) debate.scheduledAt = scheduledAt;
+    if (meetLink) debate.meetLink = meetLink;
+    if (unlockMinutesBefore !== undefined) debate.unlockMinutesBefore = Number(unlockMinutesBefore);
+    if (status) debate.status = status;
+
+    saveDatabase(db);
+    return NextResponse.json({ success: true, debate });
+  } catch (error) {
+    console.error('Update debate error:', error);
+    return NextResponse.json({ error: 'Failed to update debate.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const user = getCurrentUserFromRequest(request);
+    if (!user || !hasAdminPrivileges(user)) {
+      return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Debate ID is required.' }, { status: 400 });
+    }
+
+    const db = getDatabase();
+    db.debates = db.debates.filter((d) => d.id !== id);
+    saveDatabase(db);
+
+    return NextResponse.json({ success: true, message: 'Debate session deleted successfully.' });
+  } catch (error) {
+    console.error('Delete debate error:', error);
+    return NextResponse.json({ error: 'Failed to delete debate.' }, { status: 500 });
+  }
+}
