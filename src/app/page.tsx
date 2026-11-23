@@ -38,11 +38,6 @@ export default function HomePage() {
       <HeroCarousel />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Prominent Top Position: TODAY'S WINNER (আজকের বিজয়ী) Board */}
-        <section className="pt-2">
-          <WinnerShowcase />
-        </section>
-
         {/* Quick Highlights Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link
@@ -133,6 +128,11 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+
+        {/* Dedicated Debate Results & Winner Showcase Section */}
+        <section className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <WinnerShowcase />
+        </section>
       </div>
     </div>
   );
