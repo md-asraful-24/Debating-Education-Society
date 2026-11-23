@@ -81,7 +81,7 @@ export default function WinnerShowcase({ showTitle = true }: WinnerShowcaseProps
           }`}
         >
           <Flame className="w-3.5 h-3.5 text-amber-500" />
-          <span>{t('todayWinner')}</span>
+          <span>{language === 'bn' ? 'আজকের বিজয়ী (TODAY\'S WINNER)' : 'TODAY\'S WINNER (আজকের বিজয়ী)'}</span>
         </button>
 
         <button
@@ -94,7 +94,7 @@ export default function WinnerShowcase({ showTitle = true }: WinnerShowcaseProps
           }`}
         >
           <Award className="w-3.5 h-3.5 text-emerald-500" />
-          <span>{t('yesterdayWinner')}</span>
+          <span>{language === 'bn' ? 'গতকালের বিজয়ী (YESTERDAY\'S WINNER)' : 'YESTERDAY\'S WINNER (গতকালের বিজয়ী)'}</span>
         </button>
 
         <button
@@ -107,18 +107,25 @@ export default function WinnerShowcase({ showTitle = true }: WinnerShowcaseProps
           }`}
         >
           <Calendar className="w-3.5 h-3.5 text-blue-500" />
-          <span>{t('resultsArchive')}</span>
+          <span>{language === 'bn' ? 'আর্কাইভ ফলাফল (ARCHIVE)' : 'ARCHIVED RESULTS (আর্কাইভ)'}</span>
         </button>
       </div>
 
       {/* Tab Panels */}
       <div>
         {activeTab === 'today' && todayWinner && (
-          <WinnerCard debate={todayWinner} badgeLabel={t('todayWinner')} isHighlighted />
+          <WinnerCard
+            debate={todayWinner}
+            badgeLabel={language === 'bn' ? 'আজকের বিজয়ী (TODAY\'S WINNER)' : 'TODAY\'S WINNER (আজকের বিজয়ী)'}
+            isHighlighted
+          />
         )}
 
         {activeTab === 'yesterday' && yesterdayWinner && (
-          <WinnerCard debate={yesterdayWinner} badgeLabel={t('yesterdayWinner')} />
+          <WinnerCard
+            debate={yesterdayWinner}
+            badgeLabel={language === 'bn' ? 'গতকালের বিজয়ী (YESTERDAY\'S WINNER)' : 'YESTERDAY\'S WINNER (গতকালের বিজয়ী)'}
+          />
         )}
 
         {activeTab === 'archive' && (
@@ -232,14 +239,14 @@ function WinnerCard({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-amber-500/20">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-600/30">
-                    <Crown className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-600/30">
+                    <Crown className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-[11px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 block">
-                      {t('winnerTeam')} / চ্যাম্পিয়ন দল
+                      {language === 'bn' ? 'বিজয়ী দল (WINNING TEAM)' : 'WINNING TEAM (বিজয়ী দল)'}
                     </span>
-                    <h4 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">
+                    <h4 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">
                       {winningTeamName}
                     </h4>
                   </div>
@@ -270,10 +277,10 @@ function WinnerCard({
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <Users className="w-4 h-4 text-theme-primary" />
                   <span>
-                    {language === 'bn' ? 'বিজয়ী দলের ৩ সদস্য ও অবস্থান/দায়িত্ব:' : 'Winning Team Members & Specific Positions:'}
+                    {language === 'bn' ? 'বিজয়ী দলের ৩ সদস্য ও পদবী (3 Team Members & Roles):' : 'Winning Team Members & Roles (৩ সদস্য ও পদবী):'}
                   </span>
                 </span>
-                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                   3 Members
                 </span>
               </div>
@@ -299,8 +306,8 @@ function WinnerCard({
                       </span>
                     </div>
 
-                    <div className="pt-1 border-t border-slate-100 dark:border-slate-700/60">
-                      <span className="inline-block px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[10px] font-bold tracking-tight border border-amber-200 dark:border-amber-800/50">
+                    <div className="pt-1.5 border-t border-slate-100 dark:border-slate-700/60">
+                      <span className="inline-block px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[10px] font-bold tracking-tight border border-amber-200 dark:border-amber-800/50">
                         {member.role || (language === 'bn' ? 'সদস্য' : 'Debater')}
                       </span>
                     </div>
@@ -310,22 +317,22 @@ function WinnerCard({
             </div>
           </div>
 
-          {/* RIGHT 1 COLUMN: Dedicated Side Panel Highlighting Best Speaker (সেরা বক্তা) */}
-          <div className="lg:col-span-1 h-full rounded-2xl bg-gradient-to-br from-emerald-500/10 via-white to-slate-50 dark:from-emerald-950/30 dark:via-slate-900 dark:to-slate-900/80 p-5 sm:p-6 border-2 border-emerald-500/30 shadow-xs flex flex-col justify-between space-y-4">
+          {/* RIGHT 1 COLUMN: Dedicated Side Panel Highlighting Best Debater (সেরা তার্কিক) */}
+          <div className="lg:col-span-1 h-full rounded-2xl bg-gradient-to-br from-emerald-500/15 via-white to-slate-50 dark:from-emerald-950/40 dark:via-slate-900 dark:to-slate-900/90 p-5 sm:p-6 border-2 border-emerald-500/40 shadow-md flex flex-col justify-between space-y-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-black uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>{language === 'bn' ? 'সেরা বক্তা' : 'Best Speaker'}</span>
+                  <span>{language === 'bn' ? 'সেরা তার্কিক (BEST DEBATER)' : 'BEST DEBATER (সেরা তার্কিক)'}</span>
                 </span>
-                <Trophy className="w-4 h-4 text-emerald-500" />
+                <Trophy className="w-5 h-5 text-emerald-500" />
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 space-y-1">
                 <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
-                  {t('bestDebater')} / সেরা তার্কিক
+                  {language === 'bn' ? 'সেরা বক্তা ও তার্কিক' : 'Champion Orator'}
                 </span>
-                <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-snug mt-1 text-emerald-600 dark:text-emerald-400">
+                <div className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 leading-snug">
                   {debate.result.bestDebater || (language === 'bn' ? 'ঘোষিত হয়নি' : 'To be announced')}
                 </div>
               </div>

@@ -38,6 +38,11 @@ export default function HomePage() {
       <HeroCarousel />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        {/* Prominent Top Position: TODAY'S WINNER (আজকের বিজয়ী) Board */}
+        <section className="pt-2">
+          <WinnerShowcase />
+        </section>
+
         {/* Quick Highlights Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link
@@ -127,11 +132,6 @@ export default function HomePage() {
               <DebateScheduleCard key={debate.id} debate={debate} />
             ))}
           </div>
-        </div>
-
-        {/* Requirement 7: Debate Results & Automatic Winner Display */}
-        <div className="space-y-6 pt-4">
-          <WinnerShowcase />
         </div>
       </div>
     </div>

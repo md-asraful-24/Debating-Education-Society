@@ -181,6 +181,90 @@
   ],
   "debates": [
     {
+      "id": "debate-1795402400221",
+      "topic": {
+        "bn": "এই সংসদ মনে করে, শিক্ষাব্যবস্থায় এআই এর ব্যবহার শিক্ষার্থীদের মৌলিক সৃজনশীলতা হ্রাস করছে",
+        "en": "এই সংসদ মনে করে, শিক্ষাব্যবস্থায় এআই এর ব্যবহার শিক্ষার্থীদের মৌলিক সৃজনশীলতা হ্রাস করছে"
+      },
+      "category": {
+        "bn": "সাধারণ বিতর্ক",
+        "en": "Open Debate"
+      },
+      "scheduledAt": "2026-11-22T21:22:00.000Z",
+      "durationMinutes": 60,
+      "meetLink": "https://meet.google.com/new",
+      "unlockMinutesBefore": 6,
+      "status": "completed",
+      "teamA": {
+        "name": "সরকারি দল (Team Alpha)",
+        "members": [
+          {
+            "userId": "user-debater-1",
+            "name": "MD Zahid Hasan",
+            "email": "zahidmaxshahi@gmail.com"
+          },
+          {
+            "userId": "user-debater-2",
+            "name": "Sadia Sultana",
+            "email": "sadia.debater@gmail.com"
+          },
+          {
+            "userId": "user-debater-3",
+            "name": "Arif Hossain",
+            "email": "arif.debater@gmail.com"
+          }
+        ]
+      },
+      "teamB": {
+        "name": "বিরোধী দল (Team Beta)",
+        "members": [
+          {
+            "userId": "user-debater-4",
+            "name": "Farzana Akter",
+            "email": "farzana.debater@gmail.com"
+          },
+          {
+            "userId": "user-debater-5",
+            "name": "Tanvir Hossain",
+            "email": "tanvir.debater@gmail.com"
+          },
+          {
+            "userId": "user-debater-6",
+            "name": "Abdur Rahim",
+            "email": "rahim.debater@gmail.com"
+          }
+        ]
+      },
+      "judges": [
+        {
+          "userId": "user-admin",
+          "name": "Admin Panel",
+          "email": "admin@gmail.com",
+          "role": "chairperson"
+        },
+        {
+          "userId": "user-mod",
+          "name": "Moderator Council",
+          "email": "moderator@gmail.com",
+          "role": "vice_chairperson"
+        }
+      ],
+      "result": {
+        "winnerTeam": "teamB",
+        "winningTeamName": "",
+        "winningMembers": [],
+        "bestDebater": "xxxxxx",
+        "scoreA": 82.5,
+        "scoreB": 80,
+        "publishedAt": "2026-11-23T02:55:39.849Z",
+        "judgeRemarks": {
+          "bn": "",
+          "en": ""
+        }
+      },
+      "createdAt": "2026-11-23T02:53:20.221Z"
+    },
+    {
       "id": "debate-live-upcoming",
       "topic": {
         "bn": "এই সংসদ মনে করে, শিক্ষাব্যবস্থায় এআই এর ব্যবহার শিক্ষার্থীদের মৌলিক সৃজনশীলতা হ্রাস করছে।",
