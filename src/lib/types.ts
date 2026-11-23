@@ -45,9 +45,10 @@ export interface SliderImage {
 }
 
 export interface DebateTeamMember {
-  userId: string;
+  userId?: string;
   name: string;
-  email: string;
+  email?: string;
+  role?: string;
 }
 
 export interface DebateJudge {

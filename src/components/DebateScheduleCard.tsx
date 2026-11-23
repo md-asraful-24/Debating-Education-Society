@@ -139,7 +139,8 @@ export default function DebateScheduleCard({ debate }: DebateScheduleCardProps) 
             <ul className="text-xs text-slate-700 dark:text-slate-300 space-y-1 pl-4 list-disc">
               {debate.teamA.members.map((m, idx) => (
                 <li key={idx} className="font-medium">
-                  {m.name}
+                  <span>{m.name}</span>
+                  {m.role && <span className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 ml-1">({m.role})</span>}
                 </li>
               ))}
             </ul>
@@ -156,7 +157,8 @@ export default function DebateScheduleCard({ debate }: DebateScheduleCardProps) 
             <ul className="text-xs text-slate-700 dark:text-slate-300 space-y-1 pl-4 list-disc">
               {debate.teamB.members.map((m, idx) => (
                 <li key={idx} className="font-medium">
-                  {m.name}
+                  <span>{m.name}</span>
+                  {m.role && <span className="text-[11px] text-blue-700/80 dark:text-blue-300/80 ml-1">({m.role})</span>}
                 </li>
               ))}
             </ul>

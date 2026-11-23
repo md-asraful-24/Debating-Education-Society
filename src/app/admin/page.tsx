@@ -27,8 +27,8 @@ export default function AdminPage() {
   const { t, language } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<
-    'sliders' | 'users' | 'debates' | 'results' | 'footer' | 'themes'
-  >('sliders');
+    'sliders' | 'users' | 'debates' | 'footer' | 'themes'
+  >('debates');
 
   if (loading) {
     return (
@@ -69,10 +69,9 @@ export default function AdminPage() {
   }
 
   const tabs = [
+    { id: 'debates', label: language === 'bn' ? 'বিতর্ক সূচি, গ্রুপ ও ফলাফল' : 'Debate Schedule, Groups & Results', icon: Calendar },
     { id: 'sliders', label: t('adminSliders'), icon: ImageIcon },
     { id: 'users', label: t('adminUsers'), icon: Users },
-    { id: 'debates', label: t('adminDebates'), icon: Calendar },
-    { id: 'results', label: t('adminResults'), icon: Award },
     { id: 'footer', label: t('adminFooter'), icon: FileEdit },
     { id: 'themes', label: t('adminThemes'), icon: Palette },
   ];
@@ -130,10 +129,9 @@ export default function AdminPage() {
 
       {/* Active Tab View */}
       <div className="p-6 bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        {activeTab === 'debates' && <DebateManager />}
         {activeTab === 'sliders' && <SliderManager />}
         {activeTab === 'users' && <UserManager />}
-        {activeTab === 'debates' && <DebateManager />}
-        {activeTab === 'results' && <ResultsManager />}
         {activeTab === 'footer' && <FooterEditor />}
         {activeTab === 'themes' && <ThemeSelector />}
       </div>

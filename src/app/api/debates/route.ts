@@ -45,11 +45,11 @@ export async function POST(request: Request) {
       durationMinutes: body.durationMinutes || 60,
       meetLink: body.meetLink || 'https://meet.google.com/new',
       unlockMinutesBefore: body.unlockMinutesBefore || 6,
-      status: 'scheduled',
-      teamA: body.teamA || { name: 'Team Alpha', members: [] },
-      teamB: body.teamB || { name: 'Team Beta', members: [] },
+      status: body.status || 'scheduled',
+      teamA: body.teamA || { name: 'সরকারি দল (Team Alpha)', members: [] },
+      teamB: body.teamB || { name: 'বিরোধী দল (Team Beta)', members: [] },
       judges: body.judges || [],
-      result: null,
+      result: body.result || null,
       createdAt: new Date().toISOString(),
     };
 
@@ -89,6 +89,10 @@ export async function PUT(request: Request) {
     if (meetLink) debate.meetLink = meetLink;
     if (unlockMinutesBefore !== undefined) debate.unlockMinutesBefore = Number(unlockMinutesBefore);
     if (status) debate.status = status;
+    if (body.teamA) debate.teamA = body.teamA;
+    if (body.teamB) debate.teamB = body.teamB;
+    if (body.judges) debate.judges = body.judges;
+    if (body.result !== undefined) debate.result = body.result;
 
     saveDatabase(db);
     return NextResponse.json({ success: true, debate });
