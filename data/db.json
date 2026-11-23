@@ -570,6 +570,17 @@
       "panelRole": "chairperson",
       "message": "সম্মানিত বিচারকমণ্ডলী, বিতর্কের নির্ধারিত সময়ের ঠিক ৬ মিনিট পূর্বে মিট লিঙ্ক অটোমেটিক আনলক হবে। টিম মেম্বারদের উপস্থিতি যাচাই করে প্রস্তুত থাকুন।",
       "timestamp": "2026-11-23T01:21:38.287Z"
+    },
+    {
+      "id": "msg-1795401130659-0sttz",
+      "channelId": "general",
+      "senderId": "user-super-admin",
+      "senderName": "Super Admin (Explovia)",
+      "senderEmail": "exploviaweb.bd@gmail.com",
+      "senderRole": "super_admin",
+      "panelRole": "chairperson",
+      "message": "hi",
+      "timestamp": "2026-11-23T02:32:10.659Z"
     }
   ],
   "settings": {
@@ -668,6 +679,7 @@
           "en": "International adjudication criteria evaluating Matter, Manner, and Method with standardized scoring."
         }
       }
-    ]
+    ],
+    "logoUrl": "/images/logo.jpg"
   }
 }
