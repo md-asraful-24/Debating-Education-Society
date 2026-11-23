@@ -251,8 +251,21 @@
       ],
       "result": {
         "winnerTeam": "teamB",
-        "winningTeamName": "",
-        "winningMembers": [],
+        "winningTeamName": "বিরোধী দল (Team Beta)",
+        "winningMembers": [
+          {
+            "name": "Farzana Akter",
+            "role": "প্রধানমন্ত্রী / দলনেতা (Leader / Prime Minister)"
+          },
+          {
+            "name": "Tanvir Hossain",
+            "role": "উপনেতা (Deputy Leader)"
+          },
+          {
+            "name": "Abdur Rahim",
+            "role": "সদস্য (Team Member)"
+          }
+        ],
         "bestDebater": "xxxxxx",
         "scoreA": 82.5,
         "scoreB": 80,
@@ -729,7 +742,7 @@
       "bn": "ডিবেটিং এডুকেশন সোসাইটি ইন বাংলাদেশ",
       "en": "Debating Education Society in Bangladesh"
     },
-    "theme": "sunset",
+    "theme": "emerald",
     "officialGmail": "debatingeducationsociety.bd@gmail.com",
     "phone": "+880 1873-528395",
     "address": {
